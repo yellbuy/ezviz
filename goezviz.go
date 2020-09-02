@@ -105,8 +105,8 @@ func (c *EzvizClient) httpRPC(path string, params url.Values, requestData interf
 		if params == nil {
 			params = url.Values{}
 		}
-		if params.Get("access_token") == "" {
-			params.Set("access_token", c.AccessToken)
+		if params.Get("accessToken") == "" {
+			params.Set("accessToken", c.AccessToken)
 		}
 	}
 	return c.httpRequest(path, params, requestData, responseData)
