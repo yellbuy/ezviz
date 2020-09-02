@@ -89,10 +89,10 @@ func (c *EzvizClient) RefreshAccessToken() error {
 		return nil
 	}
 
-	params := url.Values{}
-	params.Add("appkey", c.AppKey)
-	params.Add("appsecret", c.AppSecret)
-	err = c.httpRPC("/lapp/token/get", params, nil, &res)
+	params := make(map[string]string)
+	params["appkey"] = c.AppKey
+	params["appsecret"] = c.AppSecret
+	err = c.httpRPC("/lapp/token/get", nil, params, &res)
 	if err == nil {
 		c.AccessToken = res.Data.AccessToken
 		err = c.Cache.Set(&res)
