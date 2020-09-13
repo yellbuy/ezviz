@@ -1,7 +1,6 @@
 package ezviz
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -89,10 +88,10 @@ func (c *EzvizClient) RefreshAccessToken() error {
 		return nil
 	}
 
-	params := make(map[string]string)
-	params["appkey"] = c.AppKey
-	params["appsecret"] = c.AppSecret
-	err = c.httpRPC("/lapp/token/get", nil, params, &res)
+	params := url.Values{}
+	params["appKey"] = []string{c.AppKey}
+	params["appSecret"] = []string{c.AppSecret}
+	err = c.httpRPC("/lapp/token/get", params, nil, &res)
 	if err == nil {
 		c.AccessToken = res.Data.AccessToken
 		err = c.Cache.Set(&res)
@@ -122,19 +121,10 @@ func (c *EzvizClient) httpRequest(path string, params url.Values, requestData in
 	DEBUG := os.Getenv("debug") != ""
 	url2 := "https://" + ROOT + "/" + path + "?" + params.Encode()
 	// log.Println(url2)
-	if requestData != nil {
-		d, _ := json.Marshal(requestData)
-		if DEBUG {
-			log.Printf("url: %s request: %s", url2, string(d))
-		}
-		request, _ = http.NewRequest("POST", url2, bytes.NewReader(d))
-		request.Header.Set("Content-Type", typeJSON)
-	} else {
-		if DEBUG {
-			log.Printf("url: %s", url2)
-		}
-		request, _ = http.NewRequest("GET", url2, nil)
+	if DEBUG {
+		log.Printf("url: %s", url2)
 	}
+	request, _ = http.NewRequest("POST", url2, nil)
 	resp, err := client.Do(request)
 	if err != nil {
 		return err
